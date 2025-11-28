@@ -7,7 +7,7 @@ main :: proc() {
 	rl.SetTargetFPS(FPS)
 	rl.SetWindowState({.WINDOW_RESIZABLE})
 
-	cat := NewPlayer(px = 640, py = 320, h = 64, w = 64)
+	cat := NewPlayer(px = 0, py = 0, h = 64, w = 64)
 	AddAnimationForPlayer(&cat, "cat_run", "cat_run.png", 4, 0.1)
 	AddAnimationForPlayer(&cat, "cat_idle", "cat_idle.png", 2, 0.5)
 	SetCurrentAnimationForPlayer(&cat, "cat_run")

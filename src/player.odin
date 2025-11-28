@@ -35,13 +35,33 @@ PlayerState :: struct {
 	orientation: PlayerOrientation,
 }
 
+PlayerCollisionZone :: struct {
+	name:     cstring,
+	position: rl.Vector2,
+	size:     rl.Vector2,
+	cz_rec:   rl.Rectangle,
+}
+
 Player :: struct {
 	position:        rl.Vector2,
 	velocity:        rl.Vector2,
 	size:            rl.Vector2,
 	color:           rl.Color,
+	collision_zones: map[cstring]PlayerCollisionZone,
 	using state:     PlayerState,
 	using animation: PlayerAnimation,
+}
+
+CreateCollisionZoneForPlayer :: proc(p: ^Player, zname: cstring, x, y, w, h: f32) {
+	p.collision_zones[zname] = {
+		position = {x, y},
+		size     = {w, h},
+		cz_rec   = rl.Rectangle{p.position.x - P_SCALE, p.position.y - P_SCALE, PW / 16, PH / 8},
+	}
+}
+
+PlayerCollidesWithurface :: proc(p: Player, player_cz_name: cstring, surface: Surface) -> bool {
+	return false
 }
 
 PlayerDrawAnimationUpdateState :: proc(p: ^Player) {
@@ -54,6 +74,10 @@ PlayerDrawAnimationUpdateState :: proc(p: ^Player) {
 			p.current_frame = 0
 		}
 	}
+}
+
+__DebugDrawPlayerCollider :: proc(p: Player, zname: cstring) {
+	collider := p.collision_zones[zname]
 }
 
 PlayerDrawAnimate :: proc(p: ^Player) {
@@ -155,15 +179,20 @@ UpdatePlayer :: proc(p: ^Player, dt: f32) {
 	}
 
 	p.position += p.velocity * dt
+	/**
 	if IsPlayerGrounded(p^) {
 		p.position.y = get_abs_floor_for_player(p^)
 		p.is_grounded = true
 	}
+	**/
+
+	check_if_collides_with_platform(p)
 
 	PlayerDrawAnimationUpdateState(p)
 }
 
 DrawPlayer :: proc(p: ^Player) {
 	PlayerDrawAnimate(p)
+
 }
 

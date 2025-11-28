@@ -5,9 +5,9 @@ import rl "vendor:raylib"
 
 WW :: 1280
 WH :: 720
-FPS :: 60
+FPS :: 500
 BGC :: rl.Color { 110, 184, 168, 255 }
-GRAVITY :: 2000
+GRAVITY :: 0
 CAMERA_ZOOM :: 4
 PIXEL_WINDOW_HEIGHT :: 180
 
