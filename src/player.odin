@@ -75,12 +75,12 @@ PlayerDrawAnimate :: proc(p: ^Player) {
 	dest_rec := rl.Rectangle {
 		x      = p.position.x,
 		y      = p.position.y,
-		width  = ca.frame_length * P_SCALE,
-		height = f32(ca.texture.height * P_SCALE),
+		width  = ca.frame_length,
+		height = f32(ca.texture.height),
 	}
 
-	rl.DrawTexturePro(ca.texture, src_rec, dest_rec, {0, 0}, 0, rl.WHITE)
-
+	p_origin_at_feet := rl.Vector2{dest_rec.width / 2, dest_rec.height}
+	rl.DrawTexturePro(ca.texture, src_rec, dest_rec, p_origin_at_feet, 0, rl.WHITE)
 }
 
 NewPlayer :: proc(
@@ -164,7 +164,6 @@ UpdatePlayer :: proc(p: ^Player, dt: f32) {
 	}
 
 	PlayerDrawAnimationUpdateState(p)
-
 }
 
 DrawPlayer :: proc(p: ^Player) {
