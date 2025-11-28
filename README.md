@@ -13,7 +13,7 @@ more unstructured, as its more about learning Odin.
   * [Raylib Game Engine](https://www.raylib.com/)
   * [Cat and Onion on Steam](https://store.steampowered.com/app/1922130/Cat_and_Onion/)
   * [Karl Zylinski Youtube Channel](https://www.youtube.com/c/KarlZylinski)
-  * [Making Games using Odin and Raylib Playlist](https://www.youtube.com/playlist?list=PLWms45O3n--6KCNAEETGiVTEFvnqA7qCi)
+  * [Making Games using Odin and Raylib Playlist](https://youtube.com/playlist?list=PLxE7SoPYTef1jYHJ6NxNgocVjQKkq7eEa&si=j1M26Koe-oZN02Vw)
    
 
  ## Instructions
