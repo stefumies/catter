@@ -28,8 +28,6 @@ PlayerAnimation :: struct {
 PlayerOrientation :: enum {
 	LEFT,
 	RIGHT,
-	UP,
-	DOWN,
 }
 
 PlayerState :: struct {
@@ -152,7 +150,6 @@ UpdatePlayer :: proc(p: ^Player, dt: f32) {
 	}
 
 	if p.is_grounded && rl.IsKeyDown(.SPACE) {
-		p.orientation = .UP
 		p.velocity.y = -PJSPEED
 		p.is_grounded = false
 	}

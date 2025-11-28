@@ -5,7 +5,7 @@ import rl "vendor:raylib"
 main :: proc() {
 	rl.InitWindow(WW, WH, "Cat")
 	rl.SetTargetFPS(FPS)
-    rl.SetWindowState({.WINDOW_RESIZABLE})
+	rl.SetWindowState({.WINDOW_RESIZABLE})
 
 	cat := NewPlayer(px = 640, py = 320, h = 64, w = 64)
 	AddAnimationForPlayer(&cat, "cat_run", "cat_run.png", 4, 0.1)
@@ -16,11 +16,7 @@ main :: proc() {
 		dt := rl.GetFrameTime()
 		rl.BeginDrawing()
 		rl.ClearBackground(BGC)
-		camera := get_game_camera(
-			cat,
-			{f32(rl.GetScreenWidth() / 2), f32(rl.GetScreenHeight() / 2)},
-            f32(rl.GetScreenHeight())
-		)
+		camera := get_game_camera(cat)
 		rl.BeginMode2D(camera)
 		update(&cat, dt)
 		draw(&cat)
