@@ -6,8 +6,8 @@ import rl "vendor:raylib"
 PH :: 64
 PW :: 64
 PCLR :: rl.GREEN
-PSPEED :: 400
-PJSPEED :: 800
+PSPEED :: 100
+PJSPEED :: 550
 P_SCALE :: 4
 
 PlayerAnimationSprite :: struct {
@@ -79,7 +79,6 @@ PlayerCollidesWithurfaces :: proc(p: ^Player) {
 					if p.velocity.x < 0 {
 						p.velocity.x = 0
 						p.position.x = surface.rec.x + surface.rec.width
-						p.is_grounded = true
 					}
 				}
 			}
@@ -244,3 +243,8 @@ DrawPlayer :: proc(p: ^Player) {
 	PlayerDrawAnimate(p)
 }
 
+InitAnimatons :: proc(p:^Player){
+	AddAnimationForPlayer(p, "cat_run", "cat_run.png", 4, 0.1)
+	AddAnimationForPlayer(p, "cat_idle", "cat_idle.png", 2, 0.5)
+	SetCurrentAnimationForPlayer(p, "cat_run")
+}

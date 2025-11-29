@@ -19,3 +19,9 @@ get_game_camera :: proc(p: Player) -> rl.Camera2D {
         target = p.position
     }
 }
+
+
+InitGame :: proc(p: ^Player) {
+    InitAnimatons(p)
+    InitSurfaces()
+}
