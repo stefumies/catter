@@ -35,24 +35,48 @@ PlayerState :: struct {
 	orientation: PlayerOrientation,
 }
 
-Player :: struct {
-	position:        rl.Vector2,
-	velocity:        rl.Vector2,
-	size:            rl.Vector2,
-	color:           rl.Color,
-	collision_zone:  rl.Rectangle,
-	using state:     PlayerState,
-	using animation: PlayerAnimation,
+PlayerCollisionZoneDirection :: enum {
+	TOP,
+	BOTTOM,
+	LEFT,
+	RIGHT,
 }
 
-PlayerCollidesWithurface :: proc(p: ^Player) -> bool {
-	sfc := GetSurface("block_1")
-	if rl.CheckCollisionRecs(p.collision_zone, sfc.rec) && p.velocity.y > 0 {
-		p.velocity.y = 0
-		p.position.y = sfc.rec.y
-		p.is_grounded = true
+Player :: struct {
+	position:              rl.Vector2,
+	velocity:              rl.Vector2,
+	size:                  rl.Vector2,
+	color:                 rl.Color,
+	collision_zone_bottom: rl.Rectangle,
+	collision_zone_top:    rl.Rectangle,
+	collision_zone_left:   rl.Rectangle,
+	collision_zone_right:  rl.Rectangle,
+	using state:           PlayerState,
+	using animation:       PlayerAnimation,
+}
+
+PlayerCollidesWithurface :: proc(p: ^Player, cz_direction: PlayerCollisionZoneDirection) {
+
+	cz: rl.Rectangle
+
+	switch {
+		case cz_direction == .TOP:
+			cz = p.collision_zone_top
+		case cz_direction == .BOTTOM:
+			cz = p.collision_zone_bottom
+		case cz_direction == .RIGHT:
+			cz = p.collision_zone_right
+		case cz_direction == .LEFT:
+			cz = p.collision_zone_left
 	}
-	return false
+
+	for surface in surfaces {
+		if rl.CheckCollisionRecs(cz, surface.rec) && p.velocity.y > 0 {
+			p.velocity.y = 0
+			p.position.y = surface.rec.y
+			p.is_grounded = true
+		}
+	}
 }
 
 PlayerDrawAnimationUpdateState :: proc(p: ^Player) {
@@ -88,27 +112,20 @@ PlayerDrawAnimate :: proc(p: ^Player) {
 		height = f32(ca.texture.height),
 	}
 
-	p.collision_zone = rl.Rectangle {
+	p.collision_zone_bottom = rl.Rectangle {
 		x      = p.position.x - P_SCALE,
 		y      = p.position.y - P_SCALE,
 		width  = P_SCALE * 2,
-		height = P_SCALE
+		height = P_SCALE,
 	}
 
 	p_origin_at_feet := rl.Vector2{dest_rec.width / 2, dest_rec.height}
 	rl.DrawTexturePro(ca.texture, src_rec, dest_rec, p_origin_at_feet, 0, rl.WHITE)
 	// Remove if no longer debugging
-	rl.DrawRectangleRec(p.collision_zone, {0, 255, 0, 100})
+	rl.DrawRectangleRec(p.collision_zone_bottom, {0, 255, 0, 100})
 }
 
-NewPlayer :: proc(
-	px: f32,
-	py: f32,
-	h: f32 = PH,
-	w: f32 = PH,
-	vx: f32 = 0,
-	vy: f32 = 0,
-) -> Player {
+NewPlayer :: proc(px: f32, py: f32, h: f32 = PH, w: f32 = PH, vx: f32 = 0, vy: f32 = 0) -> Player {
 	return Player {
 		position = rl.Vector2{px, py},
 		velocity = rl.Vector2{vx, vy},
@@ -170,7 +187,7 @@ UpdatePlayer :: proc(p: ^Player, dt: f32) {
 	p.is_grounded = false
 	p.position += p.velocity * dt
 
-	PlayerCollidesWithurface(p)
+	PlayerCollidesWithurface(p, .BOTTOM)
 	PlayerDrawAnimationUpdateState(p)
 }
 
