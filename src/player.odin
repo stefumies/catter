@@ -35,32 +35,23 @@ PlayerState :: struct {
 	orientation: PlayerOrientation,
 }
 
-PlayerCollisionZone :: struct {
-	name:     cstring,
-	position: rl.Vector2,
-	size:     rl.Vector2,
-	cz_rec:   rl.Rectangle,
-}
-
 Player :: struct {
 	position:        rl.Vector2,
 	velocity:        rl.Vector2,
 	size:            rl.Vector2,
 	color:           rl.Color,
-	collision_zones: map[cstring]PlayerCollisionZone,
+	collision_zone:  rl.Rectangle,
 	using state:     PlayerState,
 	using animation: PlayerAnimation,
 }
 
-CreateCollisionZoneForPlayer :: proc(p: ^Player, zname: cstring, x, y, w, h: f32) {
-	p.collision_zones[zname] = {
-		position = {x, y},
-		size     = {w, h},
-		cz_rec   = rl.Rectangle{p.position.x - P_SCALE, p.position.y - P_SCALE, PW / 16, PH / 8},
+PlayerCollidesWithurface :: proc(p: ^Player) -> bool {
+	sfc := GetSurface("block_1")
+	if rl.CheckCollisionRecs(p.collision_zone, sfc.rec) && p.velocity.y > 0 {
+		p.velocity.y = 0
+		p.position.y = sfc.rec.y
+		p.is_grounded = true
 	}
-}
-
-PlayerCollidesWithurface :: proc(p: Player, player_cz_name: cstring, surface: Surface) -> bool {
 	return false
 }
 
@@ -74,10 +65,6 @@ PlayerDrawAnimationUpdateState :: proc(p: ^Player) {
 			p.current_frame = 0
 		}
 	}
-}
-
-__DebugDrawPlayerCollider :: proc(p: Player, zname: cstring) {
-	collider := p.collision_zones[zname]
 }
 
 PlayerDrawAnimate :: proc(p: ^Player) {
@@ -101,8 +88,17 @@ PlayerDrawAnimate :: proc(p: ^Player) {
 		height = f32(ca.texture.height),
 	}
 
+	p.collision_zone = rl.Rectangle {
+		x      = p.position.x - P_SCALE,
+		y      = p.position.y - P_SCALE,
+		width  = P_SCALE * 2,
+		height = P_SCALE
+	}
+
 	p_origin_at_feet := rl.Vector2{dest_rec.width / 2, dest_rec.height}
 	rl.DrawTexturePro(ca.texture, src_rec, dest_rec, p_origin_at_feet, 0, rl.WHITE)
+	// Remove if no longer debugging
+	rl.DrawRectangleRec(p.collision_zone, {0, 255, 0, 100})
 }
 
 NewPlayer :: proc(
@@ -112,13 +108,11 @@ NewPlayer :: proc(
 	w: f32 = PH,
 	vx: f32 = 0,
 	vy: f32 = 0,
-	color: rl.Color = PCLR,
 ) -> Player {
 	return Player {
 		position = rl.Vector2{px, py},
 		velocity = rl.Vector2{vx, vy},
 		size = rl.Vector2{w, h},
-		color = color,
 	}
 }
 
@@ -149,10 +143,6 @@ SetCurrentAnimationForPlayer :: proc(p: ^Player, animation_name: cstring) {
 	p.current_animation = animation
 }
 
-IsPlayerGrounded :: proc(p: Player) -> bool {
-	return p.position.y > f32(rl.GetScreenHeight()) - p.size.y
-}
-
 UpdatePlayer :: proc(p: ^Player, dt: f32) {
 
 	p.velocity.y += GRAVITY * dt
@@ -175,24 +165,16 @@ UpdatePlayer :: proc(p: ^Player, dt: f32) {
 
 	if p.is_grounded && rl.IsKeyDown(.SPACE) {
 		p.velocity.y = -PJSPEED
-		p.is_grounded = false
 	}
 
+	p.is_grounded = false
 	p.position += p.velocity * dt
-	/**
-	if IsPlayerGrounded(p^) {
-		p.position.y = get_abs_floor_for_player(p^)
-		p.is_grounded = true
-	}
-	**/
 
-	check_if_collides_with_platform(p)
-
+	PlayerCollidesWithurface(p)
 	PlayerDrawAnimationUpdateState(p)
 }
 
 DrawPlayer :: proc(p: ^Player) {
 	PlayerDrawAnimate(p)
-
 }
 

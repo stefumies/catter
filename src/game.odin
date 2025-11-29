@@ -3,7 +3,7 @@ package main
 import rl "vendor:raylib"
 
 draw :: proc(p: ^Player) {
-    DrawSurface()
+    DrawSurfaces()
 	DrawPlayer(p)
 }
 

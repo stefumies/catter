@@ -10,6 +10,7 @@ main :: proc() {
 	cat := NewPlayer(px = 0, py = 0, h = 64, w = 64)
 	AddAnimationForPlayer(&cat, "cat_run", "cat_run.png", 4, 0.1)
 	AddAnimationForPlayer(&cat, "cat_idle", "cat_idle.png", 2, 0.5)
+	CreateNewSurface("block_1",-20, 20, 96,16, rl.RED)
 	SetCurrentAnimationForPlayer(&cat, "cat_run")
 
 	for !rl.WindowShouldClose() {
