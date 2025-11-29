@@ -39,13 +39,13 @@ PlayerState :: struct {
 PlayerCollisionZoneDirection :: enum {
 	TOP,
 	BOTTOM,
-	LEFT,
-	RIGHT,
+	FRONT,
 }
 
 PlayerCollisionZone :: struct {
 	direction: PlayerCollisionZoneDirection,
 	cz_rec:    rl.Rectangle,
+	color:     rl.Color,
 }
 
 Player :: struct {
@@ -75,16 +75,10 @@ PlayerCollidesWithurfaces :: proc(p: ^Player) {
 						p.position.y = surface.rec.y
 						p.is_grounded = true
 					}
-				case .LEFT:
+				case .FRONT:
 					if p.velocity.x < 0 {
 						p.velocity.x = 0
 						p.position.x = surface.rec.x + surface.rec.width
-						p.is_grounded = true
-					}
-				case .RIGHT:
-					if p.velocity.x > 0 {
-						p.velocity.x = 0
-						p.position.x = surface.rec.x - p.size.x
 						p.is_grounded = true
 					}
 				}
@@ -108,8 +102,9 @@ PlayerDrawAnimationUpdateState :: proc(p: ^Player) {
 CreatePlayerCollisionZone :: proc(
 	x, y, w, h: f32,
 	d: PlayerCollisionZoneDirection,
+	cl: rl.Color = rl.Color{0, 255, 0, 100},
 ) -> PlayerCollisionZone {
-	return {d, rl.Rectangle{x, y, w, h}}
+	return {d, rl.Rectangle{x, y, w, h}, cl}
 }
 
 PlayerDrawAnimate :: proc(p: ^Player) {
@@ -141,10 +136,42 @@ PlayerDrawAnimate :: proc(p: ^Player) {
 		.BOTTOM,
 	)
 
+	collision_zone_top_x := p.position.x - P_SCALE - 2
+	if p.current_animation.is_flipped == false {
+		collision_zone_top_x = p.position.x + P_SCALE -14
+	}
+
+	p.collisonZones[.TOP] = CreatePlayerCollisionZone(
+		collision_zone_top_x,
+		p.position.y - P_SCALE * P_SCALE + 1.2,
+		P_SCALE * 4,
+		P_SCALE / 2,
+		.TOP,
+	)
+
+
+	collision_zone_x := p.position.x - P_SCALE - 2.92
+
+	if p.current_animation.is_flipped == false {
+		collision_zone_x = p.position.x + P_SCALE + 1.2
+	}
+
+	p.collisonZones[.FRONT] = CreatePlayerCollisionZone(
+		collision_zone_x,
+		p.position.y - P_SCALE * 3.5,
+		2,
+		8,
+		.FRONT,
+		rl.Color{255, 100, 0, 100},
+	)
+
+
 	p_origin_at_feet := rl.Vector2{dest_rec.width / 2, dest_rec.height}
 	rl.DrawTexturePro(ca.texture, src_rec, dest_rec, p_origin_at_feet, 0, rl.WHITE)
 	// Remove if no longer debugging
-	rl.DrawRectangleRec(p.collisonZones[.BOTTOM].cz_rec, {0, 255, 0, 100})
+	for direction, zone in p.collisonZones {
+		rl.DrawRectangleRec(zone.cz_rec, zone.color)
+	}
 }
 
 NewPlayer :: proc(px: f32, py: f32, h: f32 = PH, w: f32 = PH, vx: f32 = 0, vy: f32 = 0) -> Player {
@@ -216,3 +243,4 @@ UpdatePlayer :: proc(p: ^Player, dt: f32) {
 DrawPlayer :: proc(p: ^Player) {
 	PlayerDrawAnimate(p)
 }
+
