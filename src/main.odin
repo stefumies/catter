@@ -21,6 +21,12 @@ main :: proc() {
 		rl.EndMode2D()
 		rl.EndDrawing()
 	}
+	for s in surfaces {
+		rl.UnloadTexture(s.texture)
+	}
+	for i, t in cat.animations {
+		rl.UnloadTexture(t.texture)
+	}
 	rl.CloseWindow()
 }
 
