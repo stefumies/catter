@@ -13,29 +13,24 @@ Surface :: struct {
 
 surfaces: [dynamic]Surface
 
-CreateNewSurface :: proc(name: cstring, x, y, width, height: f32, color: rl.Color = rl.GREEN) {
+CreateNewSurface :: proc(x, y, width, height: f32) {
 	surface := Surface {
-		name     = name,
 		position = {x, y},
 		size     = {width, height},
 		rec      = rl.Rectangle{x, y, width, height},
-		color    = color,
 		texture = get_asset("platform.png",rl.Texture)
 	}
 	append(&surfaces, surface)
 }
 
-
-
 DrawSurfaces :: proc() {
 	for s in surfaces {
-		rl.DrawRectangleRec(s.rec, s.color)
-		// rl.DrawTexturePro()
+		rl.DrawTextureV(s.texture, s.position, rl.WHITE)
 	}
 }
 
 InitSurfaces :: proc() {
-	CreateNewSurface("block_1",-20, 20, 96,16, rl.RED)
-	CreateNewSurface("block_2",90, -10, 96,16, rl.ORANGE)
+	CreateNewSurface(-20, 20, 96,16)
+	CreateNewSurface(90, -10, 96,16)
 }
 
